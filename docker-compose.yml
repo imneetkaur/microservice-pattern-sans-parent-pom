@@ -1,0 +1,66 @@
+version: "2"
+services:
+
+  springboot-apigateway-service:
+    build: springboot-apigateway-service/
+    restart: always
+    network_mode: host
+    depends_on:
+      - eureka-service
+    ports:
+      - 8095:8095
+    expose:
+      - 8095
+
+  eureka-service:
+    build: eureka-service/
+    restart: always
+    network_mode: host
+    ports:
+      - 8091:8091
+    expose:
+      - 8091
+
+  springboot-configserver-service:
+    build: springboot-configserver-service/
+    restart: always
+    network_mode: host
+    ports:
+      - 8096:8096
+    expose:
+      - 8096
+
+  user-service:
+    build: user-service/
+    restart: always
+    network_mode: host
+    depends_on:
+      - eureka-service
+      - springboot-configserver-service
+      - mongo
+    ports:
+      - 8093:8093
+    expose:
+      - 8093
+
+  muzix-service:
+    build: muzix-service/
+    restart: always
+    network_mode: host
+    depends_on:
+      - eureka-service
+      - springboot-configserver-service
+      - mongo
+    ports:
+      - 8094:8094
+    expose:
+      - 8094
+
+  mongo:
+    image: mongo:3.4-xenial
+    restart: always
+    ports:
+      - 27017:27017
+    network_mode: host
+    volumes:
+      - $HOME/mongo/db:/data/db
